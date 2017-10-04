@@ -18,7 +18,10 @@ EncoderClass::EncoderClass(int pin1, int pin2)
 long int EncoderClass::actualizar_cuenta()
 {
 	if (digitalRead(pin_a)) digitalRead(pin_b) ? cuenta++ : cuenta--;
+
+	//Esto solo afecta si la interrupción se configura como CHANGE
 	else digitalRead(pin_b) ? cuenta-- : cuenta++;
+
 	return cuenta;
 }
 
