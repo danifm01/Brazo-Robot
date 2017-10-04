@@ -20,6 +20,7 @@ class Motor_brazoClass
  public:
 	 Motor_brazoClass(int,int,int,int);
 	 void ajustar_velocidad(char, int);
+	 void posicion_pulsos(float pulsos_obj, float pulsos_act);
 };
 
 #endif
