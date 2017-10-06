@@ -18,7 +18,6 @@
 int operacion;
 float datos[5];
 
-byte cambio_ope;
 float pos_objetivo = 0; //posicion en grados positivo o negativo
 long int cuenta_objetivo; //posicion segun los pulsos del encoder por vuelta
 
@@ -36,7 +35,7 @@ void setup()
 
 void loop()
 {
-		switch (operacion)
+		switch ((int)datos[0])
 		{
 		case 1:
 			break;
@@ -71,7 +70,6 @@ void serialEvent() {
 	while (Serial.read() == '#') {	
 		datos[i] = Serial.parseInt();
 		i++;
-		cambio_ope = 1;
 	}
 
 /*	//Para comprobar
