@@ -1,61 +1,80 @@
 
+#include "Motor_base.h"
 #include "PID.h"
 #include "Motor_brazo.h"
 #include "Encoder.h"
-#include "TimerOne.h"
 
 //Pines con interrupción en arduino mega 2, 3, 18, 19, 20, 21
 
-
+//Encoder 1
 #define PIN1ENCODER1 2 //con interrupción
 #define PIN2ENCODER1 4
 #define PULSOS_REV_ENCODER1 4320 // 16*270
 #define GRADOS_A_PULSOS1 12 // 4320/360 = 12
+//Encoder 0
+#define PIN1ENCODER0 18 //con interrupción
+#define PIN2ENCODER0 19
+#define PULSOS_REV_ENCODER0 1700 //
+#define GRADOS_A_PULSOS0 4.72 //1700/360
 
-//Pines motor brazo
+//Pines motor brazo (motor 1)
 #define R_EN 5
 #define L_EN 6
 #define R_PWM 7 
 #define L_PWM 8
 
+//pines motor base (motor 0)
+#define IN1 8
+#define IN2 9 
+#define ENA 10
+
 //Constantes para el control pid
 #define KP1 1
-#define KI1 1
-#define KD1 1
-#define TIEMPO_PID 50 //cada cuanto tiempo se calcula el pid en ms
-#define ZONA_MUERTA1 0 //zona muerta del motor 1 (en pwm 0-255)
-#define ZONA_MUERTA2 0 //zona muerta del motor 2 (en pwm 0-255)
+#define KI1 0.002
+#define KD1 1.5
+#define KP0 1
+#define KI0 0.01
+#define KD0 6
+#define TIEMPO_PID 100 //cada cuanto tiempo se calcula el pid en ms
+#define ZONA_MUERTA1 12 //zona muerta del motor 1 (en pwm 0-255)
+#define ZONA_MUERTA0 80 //zona muerta del motor 0 (en pwm 0-255)
 
 int operacion;
-float datos[5];
+float datos[5]; //guarda los datos de la lecura del serial
 
 int pos_objetivo = 0; //posicion en grados positivo o negativo
-long int cuenta_objetivo = 0; //posicion segun los pulsos del encoder por vuelta
-
+long int cuenta_objetivo1 = 0; //posicion segun los pulsos del encoder por vuelta
+long int cuenta_objetivo0 = 0;
 
 EncoderClass encoder1(PIN1ENCODER1, PIN2ENCODER1); //El pin 1 necesita interrupción
-volatile long int cuenta1 = 0; //Es volatile para que las interrupciones puedan cambiarlo sin problemas
+EncoderClass encoder0(PIN1ENCODER0, PIN2ENCODER0);
 
 Motor_brazoClass motor1(R_EN, L_EN, R_PWM, L_PWM);
+Motor_baseClass motor0(IN1, IN2, ENA);
 
 PIDClass pid1(KP1, KI1, KD1, TIEMPO_PID, ZONA_MUERTA1);
+PIDClass pid0(KP0, KI0, KD0, TIEMPO_PID, ZONA_MUERTA0);
+
+volatile long int cuenta1 = 0; //Es volatile para que las interrupciones puedan cambiarlo sin problemas
+volatile long int cuenta0 = 0;
+
 volatile int velocidad1 = 0;
+volatile int velocidad0 = 0;
 
 void setup()
 {
+
 	//Se puede cambiar por CHANGE para aumentar la resolucion si es necesario
 	attachInterrupt(digitalPinToInterrupt(PIN1ENCODER1), comprobar_encoder1, RISING); 
+	attachInterrupt(digitalPinToInterrupt(PIN1ENCODER0), comprobar_encoder0, RISING);
 
-	//Creamos una interrupcion temporal para calcular el pid de forma regular
-	Timer1.initialize(TIEMPO_PID); 
-	Timer1.attachInterrupt(calcular_pid); //no usar pines 11 y 12 para pwm
-	Timer1.detachInterrupt();
 	Serial.begin(9600);
 	Serial.println("Serial encendido a 9600 baudios");
 }
 
 void loop()
 {
+//	motor0.ajustar_velocidad('r', 255);
 		switch ((int)datos[0])
 		{
 		case 1:
@@ -66,9 +85,11 @@ void loop()
 			}
 
 			if (datos[1] == 2) {
-				cuenta_objetivo = (int)(datos[2] * GRADOS_A_PULSOS1);
-				Timer1.attachInterrupt(calcular_pid);
+				cuenta_objetivo1 = (int)(datos[2] * GRADOS_A_PULSOS1);
+				cuenta_objetivo0 = (int)(datos[3] * GRADOS_A_PULSOS0);
+				calcular_pid();
 				motor1.posicion_pulsos(velocidad1); 
+				motor0.posicion_pulsos(velocidad0);
 			}
 
 			break;
@@ -77,14 +98,14 @@ void loop()
 		default:
 			break;
 		}
-
+	//	Serial.println(((float)cuenta0) / GRADOS_A_PULSOS0);
 
 
 }
 
 void serialEvent() {
 	int i = 0;
-
+	Serial.println("¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡");
 	for (i = 0; i < 5; i++) {
 		datos[i] = 0;
 	}
@@ -107,11 +128,23 @@ void serialEvent() {
 */
 
 }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+/******************************Funciones con interrupciones******************************/
+//////////////////////////////////////////////////////////////////////////////////////////
+
 void comprobar_encoder1() {
 	cuenta1 = encoder1.actualizar_cuenta();
 }
 
+void comprobar_encoder0() {
+	cuenta0 = encoder0.actualizar_cuenta();
+}
+
 void calcular_pid() {
-	velocidad1 = pid1.calcular(cuenta1,cuenta_objetivo);
+	velocidad1 = pid1.calcular(cuenta1, cuenta_objetivo1);
+	velocidad0 = pid0.calcular(cuenta0, cuenta_objetivo0);
 }
 

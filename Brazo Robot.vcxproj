@@ -81,17 +81,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Encoder.h" />
-    <ClInclude Include="known_16bit_timers.h" />
+    <ClInclude Include="Motor_base.h" />
     <ClInclude Include="Motor_brazo.h" />
     <ClInclude Include="PID.h" />
-    <ClInclude Include="TimerOne.h" />
     <ClInclude Include="__vm\.Brazo Robot.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Encoder.cpp" />
+    <ClCompile Include="Motor_base.cpp" />
     <ClCompile Include="Motor_brazo.cpp" />
     <ClCompile Include="PID.cpp" />
-    <ClCompile Include="TimerOne.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

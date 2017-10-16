@@ -64,7 +64,7 @@ float error = pulsos_obj - pulsos_act;
 	}
 
 	if (velocidad < 0) {
-		ajustar_velocidad('l', velocidad);
+		ajustar_velocidad('l', -velocidad);
 	}
 
 

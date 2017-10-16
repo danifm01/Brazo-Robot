@@ -27,10 +27,7 @@
     <ClInclude Include="PID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TimerOne.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="known_16bit_timers.h">
+    <ClInclude Include="Motor_base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,7 +41,7 @@
     <ClCompile Include="PID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TimerOne.cpp">
+    <ClCompile Include="Motor_base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

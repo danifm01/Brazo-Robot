@@ -20,6 +20,9 @@ class PIDClass
 	 int salidaMax;
 	 int salidaMin;
 	 int zona_muerta;
+	 unsigned long int anterior;
+	 unsigned int tiempo_pid;
+	 double salida;
 
  public:
 	 PIDClass(float kp, float kd, float ki, float tiempo_calculo, float zona_muerta);
