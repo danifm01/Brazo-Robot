@@ -11,11 +11,13 @@
 #define PIN2ENCODER1 4
 #define PULSOS_REV_ENCODER1 4320 // 16*270
 #define GRADOS_A_PULSOS1 12 // 4320/360 = 12
+#define PULSOS_A_GRADOS1 0.08333 // 360/4320
 //Encoder 0
 #define PIN1ENCODER0 18 //con interrupción
 #define PIN2ENCODER0 19
 #define PULSOS_REV_ENCODER0 1700 //
 #define GRADOS_A_PULSOS0 4.72 //1700/360
+#define PULSOS_A_GRADOS0 0.21765 //360/1700
 
 //Pines motor brazo (motor 1)
 #define R_EN 5
@@ -61,6 +63,10 @@ volatile long int cuenta0 = 0;
 volatile int velocidad1 = 0;
 volatile int velocidad0 = 0;
 
+/////////////////////////////////////////////////////////////////////////////////////////
+/*****************************************Setup*****************************************/
+/////////////////////////////////////////////////////////////////////////////////////////
+
 void setup()
 {
 
@@ -72,40 +78,39 @@ void setup()
 	Serial.println("Serial encendido a 9600 baudios");
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+/******************************************Loop******************************************/
+//////////////////////////////////////////////////////////////////////////////////////////
+
 void loop()
 {
-//	motor0.ajustar_velocidad('r', 255);
 		switch ((int)datos[0])
 		{
 		case 1:
 			break;
-		case 2:
-			if (datos[1] == 1) {
-				//Hacer coordenadas cartesianas
-			}
-
-			if (datos[1] == 2) {
-				cuenta_objetivo1 = (int)(datos[2] * GRADOS_A_PULSOS1);
-				cuenta_objetivo0 = (int)(datos[3] * GRADOS_A_PULSOS0);
-				calcular_pid();
-				motor1.posicion_pulsos(velocidad1); 
-				motor0.posicion_pulsos(velocidad0);
-			}
-
+		case 2: 
+			mover_motores_posicion();
 			break;
-		case 3:
+		case 3: 
+			mostrar_posicion();
+			break;
+		case 4:
+			mover_motores_velocidad();
 			break;
 		default:
 			break;
 		}
-	//	Serial.println(((float)cuenta0) / GRADOS_A_PULSOS0);
-
 
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+/**************************************serialEvent***************************************/
+//////////////////////////////////////////////////////////////////////////////////////////
+
 void serialEvent() {
 	int i = 0;
-	Serial.println("¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡");
+//	Serial.println("¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡");
 	for (i = 0; i < 5; i++) {
 		datos[i] = 0;
 	}
@@ -115,22 +120,53 @@ void serialEvent() {
 		datos[i] = Serial.parseInt();
 		i++;
 	}
-
-/*
-	//Para comprobar
-	for (i = 0; i < 5; i++) {
-		Serial.print("Datos ");
-		Serial.print(i);
-		Serial.print(": ");
-		Serial.println(datos[i]);
-
-	}
-*/
-
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
+/************************************Funciones Switch************************************/
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void mover_motores_posicion() {
+	if (datos[1] == 1) {
+		//Hacer coordenadas cartesianas
+	}
+
+	if (datos[1] == 2) {
+		cuenta_objetivo1 = (int)(datos[3] * GRADOS_A_PULSOS1);
+		cuenta_objetivo0 = (int)(datos[2] * GRADOS_A_PULSOS0);
+		calcular_pid();
+		motor1.velocidad(velocidad1);
+		motor0.velocidad(velocidad0);
+	}
+}
+
+void mostrar_posicion() {
+		Serial.print('#');
+		Serial.print('3');
+		Serial.print('#');
+		Serial.print('2');
+		Serial.print('#');
+		Serial.print(cuenta0 * PULSOS_A_GRADOS0);
+		Serial.print('#');
+		Serial.print(cuenta1 * PULSOS_A_GRADOS1);
+		Serial.print('#');
+		Serial.println('666'); //Hay que hacer el servo
+}
+
+void mover_motores_velocidad() {
+	if (datos[1] == 2) {
+		motor1.velocidad(datos[3]);
+		motor0.velocidad(datos[2]);
+	}
+}
+
+void calcular_pid() {
+	velocidad1 = pid1.calcular(cuenta1, cuenta_objetivo1);
+	velocidad0 = pid0.calcular(cuenta0, cuenta_objetivo0);
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 /******************************Funciones con interrupciones******************************/
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -143,8 +179,5 @@ void comprobar_encoder0() {
 	cuenta0 = encoder0.actualizar_cuenta();
 }
 
-void calcular_pid() {
-	velocidad1 = pid1.calcular(cuenta1, cuenta_objetivo1);
-	velocidad0 = pid0.calcular(cuenta0, cuenta_objetivo0);
-}
+
 

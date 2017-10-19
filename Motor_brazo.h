@@ -22,7 +22,7 @@ class Motor_brazoClass
  public:
 	 Motor_brazoClass(int rEN, int lEN, int rPWM, int lPWM);
 	 void ajustar_velocidad(char, int);
-	 void posicion_pulsos(int velocidad);
+	 void velocidad(int velocidad);
 };
 
 #endif

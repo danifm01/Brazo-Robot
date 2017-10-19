@@ -38,27 +38,8 @@ void Motor_brazoClass::ajustar_velocidad(char direccion, int velocidad)
 	}
 }
 
-void Motor_brazoClass::posicion_pulsos(int velocidad)
+void Motor_brazoClass::velocidad(int velocidad)
 {
-/*	
-float error = pulsos_obj - pulsos_act;
-	//asumimos un error de 10 pulsos, menos de un grado
-	if (error > 10) {
-		ajustar_velocidad('r', 255);
-	//	ajustar_velocidad('r', map(error, 0, 4320, 0, 255) * KP);
-	}
-	else if (error < -10) {
-		ajustar_velocidad('l', 255);
-	//	ajustar_velocidad('l', map(error, -4320, 0, 255, 0) * KP);
-	}
-	else {
-		ajustar_velocidad('r', 0);
-		ajustar_velocidad('l', 0);
-	}
-//	Serial.println(error);
-
-*/
-
 	if (velocidad > 0) {
 		ajustar_velocidad('r', velocidad);
 	}
@@ -66,8 +47,6 @@ float error = pulsos_obj - pulsos_act;
 	if (velocidad < 0) {
 		ajustar_velocidad('l', -velocidad);
 	}
-
-
 }
 
 

@@ -29,7 +29,7 @@ void Motor_baseClass::ajustar_velocidad(char direccion, int velocidad)
 	}
 }
 
-void Motor_baseClass::posicion_pulsos(int velocidad)
+void Motor_baseClass::velocidad(int velocidad)
 {
 	if (velocidad > 0) {
 		ajustar_velocidad('r', velocidad);
