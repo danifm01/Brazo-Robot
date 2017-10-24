@@ -3,7 +3,7 @@
 #include "PID.h"
 #include "Motor_brazo.h"
 #include "Encoder.h"
-#include <Servo/src/Servo.h>
+#include <Servo.h>
 
 //Pines con interrupción en arduino mega 2, 3, 18, 19, 20, 21
 
