@@ -184,6 +184,10 @@ void mover_motores_velocidad() {
 	if (datos[1] == 2) {
 		motor1.velocidad(datos[3]);
 		motor0.velocidad(datos[2]);
+
+		//Control todo o nada del servo
+		if (datos[4] > 0) servo.write(servo.read() + 1);
+		else if (datos[4] < 0) servo.write(servo.read() - 1);
 	}
 }
 
