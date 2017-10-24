@@ -3,6 +3,7 @@
 #include "PID.h"
 #include "Motor_brazo.h"
 #include "Encoder.h"
+#include <Servo/src/Servo.h>
 
 //Pines con interrupción en arduino mega 2, 3, 18, 19, 20, 21
 
@@ -26,9 +27,12 @@
 #define L_PWM 8
 
 //pines motor base (motor 0)
-#define IN1 8
-#define IN2 9 
-#define ENA 10
+#define IN1 9
+#define IN2 10 
+#define ENA 11
+
+//pin servo motor (motor 2)
+#define PIN_SERVO 12
 
 //Constantes para el control pid
 #define KP1 1
@@ -41,8 +45,8 @@
 #define ZONA_MUERTA1 12 //zona muerta del motor 1 (en pwm 0-255)
 #define ZONA_MUERTA0 80 //zona muerta del motor 0 (en pwm 0-255)
 
-int operacion;
-float datos[5]; //guarda los datos de la lecura del serial
+int operacion = 0;
+float datos[5] = { 0,0,0,0,0 }; //guarda los datos de la lecura del serial
 
 int pos_objetivo = 0; //posicion en grados positivo o negativo
 long int cuenta_objetivo1 = 0; //posicion segun los pulsos del encoder por vuelta
@@ -53,6 +57,7 @@ EncoderClass encoder0(PIN1ENCODER0, PIN2ENCODER0);
 
 Motor_brazoClass motor1(R_EN, L_EN, R_PWM, L_PWM);
 Motor_baseClass motor0(IN1, IN2, ENA);
+Servo servo;
 
 PIDClass pid1(KP1, KI1, KD1, TIEMPO_PID, ZONA_MUERTA1);
 PIDClass pid0(KP0, KI0, KD0, TIEMPO_PID, ZONA_MUERTA0);
@@ -60,8 +65,16 @@ PIDClass pid0(KP0, KI0, KD0, TIEMPO_PID, ZONA_MUERTA0);
 volatile long int cuenta1 = 0; //Es volatile para que las interrupciones puedan cambiarlo sin problemas
 volatile long int cuenta0 = 0;
 
-volatile int velocidad1 = 0;
-volatile int velocidad0 = 0;
+int velocidad1 = 0;
+int velocidad0 = 0;
+
+//Banderas para hacer varias cosas a la vez
+bool mov_motor_pos = false;
+
+//Posiciones objetivo de los motores en pulsos
+float pos_obj_grad0 = 0, pos_obj_grad1 = 0, pos_obj_grad2 = 0;
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /*****************************************Setup*****************************************/
@@ -73,6 +86,8 @@ void setup()
 	//Se puede cambiar por CHANGE para aumentar la resolucion si es necesario
 	attachInterrupt(digitalPinToInterrupt(PIN1ENCODER1), comprobar_encoder1, RISING); 
 	attachInterrupt(digitalPinToInterrupt(PIN1ENCODER0), comprobar_encoder0, RISING);
+
+	servo.attach(PIN_SERVO);
 
 	Serial.begin(9600);
 	Serial.println("Serial encendido a 9600 baudios");
@@ -90,18 +105,28 @@ void loop()
 		case 1:
 			break;
 		case 2: 
-			mover_motores_posicion();
+			mov_motor_pos = true;
+			pos_obj_grad0 = datos[2];
+			pos_obj_grad1 = datos[3];
+			pos_obj_grad2 = datos[4];
 			break;
 		case 3: 
 			mostrar_posicion();
 			break;
 		case 4:
+			mov_motor_pos = false;
 			mover_motores_velocidad();
 			break;
 		default:
 			break;
 		}
 
+		if (mov_motor_pos) {
+			mover_motores_posicion();
+	}
+
+		//Muestra la posicion en cada ciclo
+		mostrar_posicion(); 
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -133,11 +158,12 @@ void mover_motores_posicion() {
 	}
 
 	if (datos[1] == 2) {
-		cuenta_objetivo1 = (int)(datos[3] * GRADOS_A_PULSOS1);
-		cuenta_objetivo0 = (int)(datos[2] * GRADOS_A_PULSOS0);
+		cuenta_objetivo1 = (int)(pos_obj_grad1 * GRADOS_A_PULSOS1);
+		cuenta_objetivo0 = (int)(pos_obj_grad0 * GRADOS_A_PULSOS0);
 		calcular_pid();
 		motor1.velocidad(velocidad1);
 		motor0.velocidad(velocidad0);
+		servo.write(pos_obj_grad2);
 	}
 }
 
@@ -151,7 +177,7 @@ void mostrar_posicion() {
 		Serial.print('#');
 		Serial.print(cuenta1 * PULSOS_A_GRADOS1);
 		Serial.print('#');
-		Serial.println('666'); //Hay que hacer el servo
+		Serial.println(servo.read()); 
 }
 
 void mover_motores_velocidad() {

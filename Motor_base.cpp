@@ -38,6 +38,12 @@ void Motor_baseClass::velocidad(int velocidad)
 	if (velocidad < 0) {
 		ajustar_velocidad('l', -velocidad);
 	}
+
+	else {
+		digitalWrite(in1, LOW);
+		digitalWrite(in2, LOW);
+		analogWrite(ena, velocidad);
+	}
 }
 
 

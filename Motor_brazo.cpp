@@ -5,10 +5,6 @@
 #include "Motor_brazo.h"
 #include "PID.h"
 
-
-#define KP 50 //Constante P para el control 
-
-
 Motor_brazoClass::Motor_brazoClass(int rEN, int lEN, int rPWM, int lPWM)
 {
 	r_en = rEN;
@@ -46,6 +42,10 @@ void Motor_brazoClass::velocidad(int velocidad)
 
 	if (velocidad < 0) {
 		ajustar_velocidad('l', -velocidad);
+	}
+	else {
+		analogWrite(r_pwm, 0);
+		analogWrite(l_pwm, 0);
 	}
 }
 
