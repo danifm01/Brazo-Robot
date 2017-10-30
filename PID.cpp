@@ -4,7 +4,7 @@
 
 #include "PID.h"
 
-PIDClass::PIDClass(float tempkp, float tempki, float tempkd, float tiempo_calculo, float tempzona_muerta) {
+void PIDClass::inicializar(float tempkp, float tempki, float tempkd, float tiempo_calculo, float tempzona_muerta) {
 	setConstantes(tempkp, tempki, tempkd, tiempo_calculo);
 	tiempo_pid = tiempo_calculo;
 	anterior = 0;

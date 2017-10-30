@@ -25,7 +25,7 @@ class PIDClass
 	 double salida;
 
  public:
-	 PIDClass(float kp, float kd, float ki, float tiempo_calculo, float zona_muerta);
+	 void inicializar(float kp, float kd, float ki, float tiempo_calculo, float zona_muerta);
 	 int calcular(int cuenta_actual, int cuenta_objetivo);
 	 void setConstantes(float tempkp, float tempki, float tempkd, float tiempo);
 };

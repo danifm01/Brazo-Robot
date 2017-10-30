@@ -5,7 +5,7 @@
 #include "Encoder.h"
 
 
-EncoderClass::EncoderClass(int pin1, int pin2)
+void EncoderClass::inicializar(int pin1, int pin2)
 {
 	pin_a = pin1;
 	pin_b = pin2;

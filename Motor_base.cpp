@@ -4,7 +4,7 @@
 
 #include "Motor_base.h"
 
-Motor_baseClass::Motor_baseClass(int In1,int In2, int Ena) {
+void Motor_baseClass::inicializar(int In1,int In2, int Ena) {
 	in1 = In1;
 	in2 = In2;
 	ena = Ena;
@@ -12,7 +12,7 @@ Motor_baseClass::Motor_baseClass(int In1,int In2, int Ena) {
 	pinMode(in2, OUTPUT);
 	pinMode(ena, OUTPUT);
 }
-
+/*
 void Motor_baseClass::ajustar_velocidad(char direccion, int velocidad)
 {
 
@@ -28,15 +28,21 @@ void Motor_baseClass::ajustar_velocidad(char direccion, int velocidad)
 		analogWrite(ena, velocidad);
 	}
 }
-
+*/
 void Motor_baseClass::velocidad(int velocidad)
 {
 	if (velocidad > 0) {
-		ajustar_velocidad('r', velocidad);
+	//	ajustar_velocidad('r', velocidad);
+		digitalWrite(in1, HIGH);
+		digitalWrite(in2, LOW);
+		analogWrite(ena, velocidad);
 	}
 
-	if (velocidad < 0) {
-		ajustar_velocidad('l', -velocidad);
+	else if (velocidad < 0) {
+	//	ajustar_velocidad('l', -velocidad);
+		digitalWrite(in1, LOW);
+		digitalWrite(in2, HIGH);
+		analogWrite(ena, -velocidad);
 	}
 
 	else {

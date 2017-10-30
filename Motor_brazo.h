@@ -20,7 +20,7 @@ class Motor_brazoClass
 	 int pwm_vel;
 	 int pos_objetivo;
  public:
-	 Motor_brazoClass(int rEN, int lEN, int rPWM, int lPWM);
+	 void inicializar(int rEN, int lEN, int rPWM, int lPWM);
 	 void ajustar_velocidad(char, int);
 	 void velocidad(int velocidad);
 };

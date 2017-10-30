@@ -16,7 +16,7 @@ class EncoderClass
 	 int pin_a;
 	 int pin_b;
  public:
-	EncoderClass (int,int);
+	void inicializar (int,int);
 	long int actualizar_cuenta();
 	void setCuenta(long int);
 	long int getCuenta();
