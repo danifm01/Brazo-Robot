@@ -11,8 +11,8 @@ void EncoderClass::inicializar(int pin1, int pin2)
 	pin_b = pin2;
 	cuenta = 0;
 
-	pinMode(pin_a, INPUT_PULLUP);
-	pinMode(pin_b, INPUT_PULLUP);
+	pinMode(pin_a, INPUT);
+	pinMode(pin_b, INPUT);
 }
 
 long int EncoderClass::actualizar_cuenta()

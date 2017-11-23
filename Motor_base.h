@@ -18,7 +18,7 @@ class Motor_baseClass
 
  public:
 	 void inicializar(int In1, int In2, int Ena);
-	 void ajustar_velocidad(char direccion, int velocidad);
+//	 void ajustar_velocidad(char direccion, int velocidad);
 	 void velocidad(int velocidad);
 };
 
